@@ -40,6 +40,7 @@ export interface Competition {
     acquisitionDate: string;
     acquisitionTime: string;
     acquisitionPlace: string;
+    applicationDeadline: string;
     judges: Judge[];
 }
 

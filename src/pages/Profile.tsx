@@ -89,7 +89,7 @@ const Profile = () => {
 
     return (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
+            <div className="bg-white dark:bg-gray-800 shadow-xl rounded-2xl overflow-hidden transition-colors duration-300">
                 {/* Header */}
                 <div className="bg-gradient-to-r from-orange-400 to-red-500 px-8 py-10 text-white">
                     <div className="flex items-center gap-6">
@@ -136,8 +136,8 @@ const Profile = () => {
                     ) : (
                         <div className="space-y-8">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div className="bg-gray-50 p-6 rounded-xl">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                <div className="bg-gray-50 dark:bg-gray-700/50 p-6 rounded-xl">
+                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                                         <UserIcon className="w-5 h-5 text-orange-500" /> Personal Info
                                     </h3>
                                     <div className="space-y-3 text-gray-600">
@@ -145,8 +145,8 @@ const Profile = () => {
                                         <p><span className="font-medium text-gray-900">Phone:</span> {user.phone || 'Not provided'}</p>
                                     </div>
                                 </div>
-                                <div className="bg-gray-50 p-6 rounded-xl">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                <div className="bg-gray-50 dark:bg-gray-700/50 p-6 rounded-xl">
+                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                                         <MapPin className="w-5 h-5 text-orange-500" /> Address
                                     </h3>
                                     <div className="space-y-3 text-gray-600">
@@ -157,9 +157,9 @@ const Profile = () => {
                             </div>
 
                             {/* Payment Methods Section */}
-                            <div className="bg-white border rounded-xl overflow-hidden">
-                                <div className="p-6 bg-gray-50 border-b flex justify-between items-center">
-                                    <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                            <div className="bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-xl overflow-hidden">
+                                <div className="p-6 bg-gray-50 dark:bg-gray-700/50 border-b dark:border-gray-700 flex justify-between items-center">
+                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                                         <CreditCard className="w-5 h-5 text-orange-500" /> Payment Methods
                                     </h3>
                                     <Button size="sm" onClick={() => setShowAddCard(true)}>
@@ -168,14 +168,14 @@ const Profile = () => {
                                 </div>
                                 <div className="divide-y">
                                     {paymentMethods.map((pm) => (
-                                        <div key={pm.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
+                                        <div key={pm.id} className="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-12 h-8 bg-gray-100 rounded border flex items-center justify-center text-xs font-bold text-gray-500 uppercase">
+                                                <div className="w-12 h-8 bg-gray-100 dark:bg-gray-600 rounded border dark:border-gray-500 flex items-center justify-center text-xs font-bold text-gray-500 dark:text-gray-300 uppercase">
                                                     {pm.brand}
                                                 </div>
                                                 <div>
-                                                    <p className="font-medium text-gray-900">•••• •••• •••• {pm.last4}</p>
-                                                    <p className="text-sm text-gray-500">Expires {pm.expiryMonth}/{pm.expiryYear}</p>
+                                                    <p className="font-medium text-gray-900 dark:text-white">•••• •••• •••• {pm.last4}</p>
+                                                    <p className="text-sm text-gray-500 dark:text-gray-400">Expires {pm.expiryMonth}/{pm.expiryYear}</p>
                                                 </div>
                                             </div>
                                             <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700" onClick={() => handleDeleteCard(pm.id)}>
@@ -191,10 +191,10 @@ const Profile = () => {
                                 </div>
                             </div>
 
-                            <div className="pt-6 border-t flex justify-between items-center bg-red-50 p-6 rounded-xl">
+                            <div className="pt-6 border-t dark:border-gray-700 flex justify-between items-center bg-red-50 dark:bg-red-900/10 p-6 rounded-xl">
                                 <div>
-                                    <h4 className="text-red-800 font-semibold">Danger Zone</h4>
-                                    <p className="text-red-600 text-sm">Delete your account and all associated data.</p>
+                                    <h4 className="text-red-800 dark:text-red-300 font-semibold">Danger Zone</h4>
+                                    <p className="text-red-600 dark:text-red-400 text-sm">Delete your account and all associated data.</p>
                                 </div>
                                 <Button variant="outline" className="border-red-500 text-red-600 hover:bg-red-100" onClick={handleDelete}>
                                     <Trash2 className="w-4 h-4 mr-2" /> Delete Account
@@ -208,44 +208,44 @@ const Profile = () => {
             {/* Add Card Modal */}
             {showAddCard && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md p-6">
                         <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-xl font-bold text-gray-900">Add New Card</h3>
-                            <button onClick={() => setShowAddCard(false)} className="text-gray-400 hover:text-gray-600">
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white">Add New Card</h3>
+                            <button onClick={() => setShowAddCard(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
                                 <X className="w-6 h-6" />
                             </button>
                         </div>
                         <form onSubmit={handleAddCard} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Card Number</label>
                                 <input
                                     type="text"
                                     required
                                     placeholder="0000 0000 0000 0000"
-                                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
+                                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                     value={newCard.number}
                                     onChange={e => setNewCard({ ...newCard, number: e.target.value })}
                                 />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Expiry Date</label>
                                     <input
                                         type="text"
                                         required
                                         placeholder="MM/YY"
-                                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
+                                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                         value={newCard.expiry}
                                         onChange={e => setNewCard({ ...newCard, expiry: e.target.value })}
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">CVC</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">CVC</label>
                                     <input
                                         type="text"
                                         required
                                         placeholder="123"
-                                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
+                                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                         value={newCard.cvc}
                                         onChange={e => setNewCard({ ...newCard, cvc: e.target.value })}
                                     />

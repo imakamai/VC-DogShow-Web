@@ -67,40 +67,40 @@ const Pricing = () => {
     ];
 
     return (
-        <div className="bg-gray-50 py-12 sm:py-16 lg:py-20 min-h-screen">
+        <div className="bg-gray-50 dark:bg-gray-900 py-12 sm:py-16 lg:py-20 min-h-screen transition-colors duration-300">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center">
-                    <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+                    <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl">
                         Official Price List 2025
                     </h2>
-                    <p className="mt-4 text-xl text-gray-600">
+                    <p className="mt-4 text-xl text-gray-600 dark:text-gray-400">
                         Kinološki Savez Republike Srbije (KSRS)
                     </p>
-                    <p className="mt-2 text-sm text-gray-500">
+                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-500">
                         Effective from January 1, 2025
                     </p>
                 </div>
 
                 <div className="mt-16 space-y-12">
                     {pricingData.map((category) => (
-                        <div key={category.title} className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-200">
-                            <div className="p-6 bg-orange-50 border-b border-orange-100 flex items-center">
-                                <div className="p-2 bg-white rounded-lg shadow-sm mr-4">
+                        <div key={category.title} className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700 transition-colors duration-300">
+                            <div className="p-6 bg-orange-50 dark:bg-orange-900/20 border-b border-orange-100 dark:border-orange-900/30 flex items-center">
+                                <div className="p-2 bg-white dark:bg-gray-700 rounded-lg shadow-sm mr-4">
                                     {category.icon}
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-900">{category.title}</h3>
+                                <h3 className="text-xl font-bold text-gray-900 dark:text-white">{category.title}</h3>
                             </div>
-                            <div className="divide-y divide-gray-100">
+                            <div className="divide-y divide-gray-100 dark:divide-gray-700">
                                 {category.items.map((item, index) => (
-                                    <div key={index} className="p-6 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-gray-50 transition-colors duration-150">
+                                    <div key={index} className="p-6 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
                                         <div className="flex-1 pr-4">
-                                            <h4 className="text-sm font-medium text-gray-900">{item.name}</h4>
+                                            <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">{item.name}</h4>
                                             {item.note && (
-                                                <p className="mt-1 text-xs text-gray-500">{item.note}</p>
+                                                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{item.note}</p>
                                             )}
                                         </div>
                                         <div className="mt-4 sm:mt-0 flex-shrink-0">
-                                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-orange-100 text-orange-800">
+                                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-orange-100 dark:bg-orange-900/40 text-orange-800 dark:text-orange-200">
                                                 {item.price}
                                             </span>
                                         </div>

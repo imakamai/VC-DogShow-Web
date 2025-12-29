@@ -17,7 +17,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             primary: 'bg-gradient-to-r from-orange-500 to-red-600 text-white hover:from-orange-600 hover:to-red-700 shadow-md',
             secondary: 'bg-gray-800 text-white hover:bg-gray-900',
             outline: 'border-2 border-orange-500 text-orange-600 hover:bg-orange-50',
-            ghost: 'hover:bg-gray-100 text-gray-700',
+            ghost: 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300',
         };
 
         const sizes = {
@@ -50,12 +50,12 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     ({ className, label, error, ...props }, ref) => {
         return (
             <div className="w-full">
-                {label && <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>}
+                {label && <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{label}</label>}
                 <input
                     ref={ref}
                     className={cn(
-                        'w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all',
-                        error ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-white',
+                        'w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all dark:bg-gray-800 dark:text-white dark:border-gray-700',
+                        error ? 'border-red-500 bg-red-50 dark:bg-red-900/10' : 'border-gray-200 bg-white',
                         className
                     )}
                     {...props}
