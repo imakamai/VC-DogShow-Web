@@ -4,13 +4,13 @@ import { loadStripe } from '@stripe/stripe-js';
 import api from '../services/api';
 import { DogDTO, Competition } from '../types';
 import { Button, Input } from '../components/ui';
-import { CreditCard, Dog as DogIcon, Trophy, MapPin, Calendar, Clock } from 'lucide-react';
+import { CreditCard, Dog as DogIcon, Trophy, MapPin, Calendar } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
+import { config } from '../config';
 
-// Replace with your actual publishable key or env variable
-const stripePromise = loadStripe('pk_test_51Mz...');
+// Initialize Stripe with the key from config
+const stripePromise = loadStripe(config.STRIPE_PUBLISHABLE_KEY);
 
-// Extended DTO to include competition details form fields
 // Extended DTO to include competition details form fields
 interface ApplicationDTO extends Partial<DogDTO> {
     competitionId: number;
@@ -28,10 +28,8 @@ const COMPETITION_CLASSES = [
     "Veteran (8 years +)"
 ];
 
-
-
 const Apply = () => {
-    const { register, handleSubmit, watch, setValue, formState: { errors }, reset, trigger } = useForm<ApplicationDTO>();
+    const { register, handleSubmit, watch, setValue, formState: { errors }, reset } = useForm<ApplicationDTO>();
     const [loading, setLoading] = useState(false);
     const [step, setStep] = useState<'info' | 'payment'>('info');
     const [applicationData, setApplicationData] = useState<ApplicationDTO | null>(null);
@@ -40,7 +38,34 @@ const Apply = () => {
 
     // New state for registration mode
     const [registrationMode, setRegistrationMode] = useState<'existing' | 'new'>('existing');
-    const [userDogs, setUserDogs] = useState<DogDTO[]>([]); // Assuming DogDTO includes id, if not we need 'Dog' type which has id
+    const [userDogs, setUserDogs] = useState<DogDTO[]>([]);
+
+    // Currency State
+    const [currency, setCurrency] = useState<'rsd' | 'eur' | 'usd'>('rsd');
+
+    // Pricing Constants
+    const BASE_PRICE_RSD = 8000;
+    const EXCHANGE_RATES = {
+        rsd: 1,
+        eur: 117,
+        usd: 108
+    };
+
+    const getPriceDisplay = () => {
+        if (currency === 'rsd') return `${BASE_PRICE_RSD} RSD`;
+        if (currency === 'eur') return `${(BASE_PRICE_RSD / EXCHANGE_RATES.eur).toFixed(2)} EUR`;
+        if (currency === 'usd') return `${(BASE_PRICE_RSD / EXCHANGE_RATES.usd).toFixed(2)} USD`;
+        return '';
+    };
+
+    const getStripeAmount = () => {
+        // Stripe expects smallest unit (cents/para)
+        // All supported currencies (RSD, EUR, USD) use 2 decimals, so multiply by 100
+        if (currency === 'rsd') return BASE_PRICE_RSD * 100;
+        if (currency === 'eur') return Math.round((BASE_PRICE_RSD / EXCHANGE_RATES.eur) * 100);
+        if (currency === 'usd') return Math.round((BASE_PRICE_RSD / EXCHANGE_RATES.usd) * 100);
+        return 0;
+    };
 
     const selectedCompetitionId = watch('competitionId');
     const selectedCompetition = competitions.find(c => c.id == selectedCompetitionId);
@@ -50,7 +75,7 @@ const Apply = () => {
             try {
                 const [compRes, dogsRes] = await Promise.all([
                     api.get<Competition[]>('Competition/active'),
-                    api.get<any[]>('/Dog') // fetch dogs
+                    api.get<any[]>('/Dog')
                 ]);
                 setCompetitions(compRes.data);
                 setUserDogs(dogsRes.data);
@@ -68,10 +93,6 @@ const Apply = () => {
                 // Pre-select dog if passed in state
                 if (location.state?.dogId) {
                     setRegistrationMode('existing');
-                    // We need to wait for userDogs to be populated, but since we are in the same effect processing result...
-                    // The setValue might need to happen after render or we rely on hook form.
-                    // Actually, setValue works even if options aren't there yet for standard selects usually, 
-                    // but let's make sure we set it.
                     setValue('dogId', location.state.dogId);
                 }
             } catch (error) {
@@ -95,6 +116,7 @@ const Apply = () => {
         if (!applicationData) return;
         setLoading(true);
         try {
+            // 1. Submit the Application
             const payload = {
                 competitionId: Number(applicationData.competitionId),
                 competitionClass: applicationData.competitionClass,
@@ -127,22 +149,30 @@ const Apply = () => {
             }
 
             const response = await api.post('/Payment/create-checkout-session', {
-                amount: 5000,
-                description: `Entry Fee for ${dogName} - ${applicationData.competitionClass}`,
+                amount: getStripeAmount(),
+                currency: currency,
+                description: `Entry Fee for ${dogName} (${applicationData.competitionClass})`,
                 successUrl: `${window.location.origin}/dogs`,
                 cancelUrl: `${window.location.origin}/apply`,
             });
 
             const { sessionId } = response.data;
+
+            // 3. Redirect to Stripe
             const result = await (stripe as any).redirectToCheckout({ sessionId });
 
             if (result.error) {
                 alert(result.error.message);
             }
 
-        } catch (error) {
-            console.error('Application failed', error);
-            alert('Failed to process application. Please try again.');
+        } catch (error: any) {
+            console.error('Application/Payment failed', error);
+            // Handle specific errors if possible
+            if (error.response?.status === 400 && error.response.data?.error?.includes("Invalid API Key")) {
+                alert('Currently payment is not working. Please contact the administrator.');
+            } else {
+                alert('Currently payment is not working or something went wrong. Please try again later.');
+            }
         } finally {
             setLoading(false);
         }
@@ -150,23 +180,38 @@ const Apply = () => {
 
     return (
         <div className="max-w-3xl mx-auto px-4 py-12">
-            <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-                <div className="bg-gray-900 px-8 py-6 text-white text-center">
-                    <h1 className="text-2xl font-bold">Competition Application</h1>
-                    <p className="text-gray-400 mt-1">Register your dog for the upcoming show</p>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
+                <div className="bg-orange-600 px-8 py-6">
+                    <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                        <Trophy className="h-6 w-6" /> Competition Registration
+                    </h2>
+                    <p className="text-orange-100 mt-1">Enter your dog into the upcoming show</p>
                 </div>
 
                 <div className="p-8">
+                    {/* Step Indicator */}
+                    <div className="flex items-center justify-center mb-8">
+                        <div className={`flex items-center gap-2 ${step === 'info' ? 'text-orange-600 font-bold' : 'text-gray-400 dark:text-gray-500'}`}>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'info' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600' : 'bg-gray-100 dark:bg-gray-700'}`}>1</div>
+                            <span>Dog Info</span>
+                        </div>
+                        <div className="w-16 h-1 bg-gray-100 dark:bg-gray-700 mx-4"></div>
+                        <div className={`flex items-center gap-2 ${step === 'payment' ? 'text-orange-600 font-bold' : 'text-gray-400 dark:text-gray-500'}`}>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'payment' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600' : 'bg-gray-100 dark:bg-gray-700'}`}>2</div>
+                            <span>Payment</span>
+                        </div>
+                    </div>
+
                     {step === 'info' ? (
                         <form onSubmit={handleSubmit(onInfoSubmit)} className="space-y-8">
 
                             {/* Registration Mode Toggle */}
-                            <div className="flex bg-gray-100 p-1 rounded-lg">
+                            <div className="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
                                 <button
                                     type="button"
                                     className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${registrationMode === 'existing'
-                                        ? 'bg-white text-gray-900 shadow-sm'
-                                        : 'text-gray-500 hover:text-gray-700'
+                                        ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white'
+                                        : 'text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100'
                                         }`}
                                     onClick={() => setRegistrationMode('existing')}
                                 >
@@ -175,8 +220,8 @@ const Apply = () => {
                                 <button
                                     type="button"
                                     className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${registrationMode === 'new'
-                                        ? 'bg-white text-gray-900 shadow-sm'
-                                        : 'text-gray-500 hover:text-gray-700'
+                                        ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-800 dark:text-white'
+                                        : 'text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100'
                                         }`}
                                     onClick={() => setRegistrationMode('new')}
                                 >
@@ -186,16 +231,16 @@ const Apply = () => {
 
                             {/* Dog Information Section */}
                             <div>
-                                <h3 className="text-lg font-semibold flex items-center gap-2 mb-4 text-gray-900 border-b pb-2">
+                                <h3 className="text-lg font-semibold flex items-center gap-2 mb-4 text-gray-900 dark:text-white border-b pb-2">
                                     <DogIcon className="text-orange-500" /> Dog Information
                                 </h3>
 
                                 {registrationMode === 'existing' ? (
                                     <div className="space-y-4">
-                                        <label className="block text-sm font-medium text-gray-700">Select Your Dog</label>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Select Your Dog</label>
                                         <select
                                             {...register('dogId', { required: registrationMode === 'existing' ? 'Please select a dog' : false })}
-                                            className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none bg-white border-gray-300"
+                                            className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                                         >
                                             <option value="">-- Choose from your dogs --</option>
                                             {userDogs.map((dog: any) => (
@@ -220,8 +265,8 @@ const Apply = () => {
                                         <Input label="Size/Height (cm)" type="number" {...register('size', { min: 0 })} error={errors.size?.message} />
 
                                         <div className="space-y-1">
-                                            <label className="block text-sm font-medium text-gray-700">Gender</label>
-                                            <select {...register('gender', { required: registrationMode === 'new' && 'Gender is required' })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none bg-white border-gray-300">
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Gender</label>
+                                            <select {...register('gender', { required: registrationMode === 'new' && 'Gender is required' })} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white">
                                                 <option value="">Select Gender</option>
                                                 <option value="Male">Male</option>
                                                 <option value="Female">Female</option>
@@ -238,17 +283,17 @@ const Apply = () => {
 
                             {/* Competition Section */}
                             <div>
-                                <h3 className="text-lg font-semibold flex items-center gap-2 mb-4 text-gray-900 border-b pb-2">
+                                <h3 className="text-lg font-semibold flex items-center gap-2 mb-4 text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">
                                     <Trophy className="text-orange-500" /> Competition Details
                                 </h3>
                                 <div className="space-y-6">
 
                                     {/* Select Competition */}
                                     <div className="space-y-1">
-                                        <label className="block text-sm font-medium text-gray-700">Choose Competition</label>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Choose Competition</label>
                                         <select
                                             {...register('competitionId', { required: 'Please select a competition' })}
-                                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none bg-white border-gray-300"
+                                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                                         >
                                             <option value="">-- Select Active Competition --</option>
                                             {competitions.map(comp => (
@@ -262,7 +307,7 @@ const Apply = () => {
 
                                     {/* Dynamic Info Display */}
                                     {selectedCompetition && (
-                                        <div className="bg-orange-50 border border-orange-100 rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
+                                        <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-900/30 rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300">
                                             <div className="flex items-center gap-2">
                                                 <Calendar className="w-4 h-4 text-orange-600" />
                                                 <span className="font-medium">Starts At:</span>
@@ -278,10 +323,10 @@ const Apply = () => {
 
                                     {/* Competition Class */}
                                     <div className="space-y-1">
-                                        <label className="block text-sm font-medium text-gray-700">Competition Class</label>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Competition Class</label>
                                         <select
                                             {...register('competitionClass', { required: 'Please select a class' })}
-                                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none bg-white border-gray-300"
+                                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                                         >
                                             <option value="">-- Select Class --</option>
                                             {COMPETITION_CLASSES.map(cls => (
@@ -300,10 +345,35 @@ const Apply = () => {
                         </form>
                     ) : (
                         <div className="text-center space-y-8 py-4">
-                            <div className="bg-green-50 p-6 rounded-xl border border-green-100 inline-block w-full">
-                                <h3 className="text-xl font-bold text-green-800">Application Ready</h3>
-                                <p className="text-green-600 mt-2">Please complete the entry fee payment to finalize registration.</p>
-                                <div className="mt-4 text-3xl font-extrabold text-gray-900">$50.00</div>
+                            <div className="bg-green-50 dark:bg-green-900/20 p-6 rounded-xl border border-green-100 dark:border-green-900/30 inline-block w-full">
+                                <h3 className="text-xl font-bold text-green-800 dark:text-green-400">Application Ready</h3>
+                                <p className="text-green-600 dark:text-green-300 mt-2">Please select currency and complete payment.</p>
+
+                                {/* Currency Selection */}
+                                <div className="flex justify-center gap-4 mt-4 mb-2">
+                                    <button
+                                        onClick={() => setCurrency('rsd')}
+                                        className={`px-3 py-1 rounded-md text-sm font-bold transition-colors ${currency === 'rsd' ? 'bg-orange-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300'}`}
+                                    >
+                                        RSD
+                                    </button>
+                                    <button
+                                        onClick={() => setCurrency('eur')}
+                                        className={`px-3 py-1 rounded-md text-sm font-bold transition-colors ${currency === 'eur' ? 'bg-orange-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300'}`}
+                                    >
+                                        EUR
+                                    </button>
+                                    <button
+                                        onClick={() => setCurrency('usd')}
+                                        className={`px-3 py-1 rounded-md text-sm font-bold transition-colors ${currency === 'usd' ? 'bg-orange-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300'}`}
+                                    >
+                                        USD
+                                    </button>
+                                </div>
+
+                                <div className="mt-2 text-3xl font-extrabold text-gray-900 dark:text-white">
+                                    {getPriceDisplay()}
+                                </div>
                             </div>
 
                             <div className="space-y-4">

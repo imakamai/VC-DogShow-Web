@@ -35,7 +35,7 @@ const AddDog = () => {
 
     return (
         <div className="max-w-2xl mx-auto px-4 py-12">
-            <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden transition-colors duration-300">
                 <div className="bg-gray-900 px-8 py-6 text-white text-center">
                     <h1 className="text-2xl font-bold flex items-center justify-center gap-2">
                         <DogIcon className="h-8 w-8 text-orange-500" />
@@ -67,10 +67,10 @@ const AddDog = () => {
                             />
 
                             <div className="space-y-1">
-                                <label className="block text-sm font-medium text-gray-700">Gender</label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Gender</label>
                                 <select
                                     {...register('gender', { required: 'Gender is required' })}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none bg-white border-gray-300"
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white"
                                 >
                                     <option value="">Select Gender</option>
                                     <option value="Male">Male</option>

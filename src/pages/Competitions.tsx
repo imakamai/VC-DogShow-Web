@@ -37,7 +37,7 @@ const Competitions = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex justify-center items-center">
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex justify-center items-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
             </div>
         );
@@ -60,11 +60,11 @@ const Competitions = () => {
 
                 {/* Header */}
                 <div className="text-center mb-16">
-                    <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
+                    <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white sm:text-5xl md:text-6xl">
                         <span className="block">World Class</span>
                         <span className="block text-orange-600">Competitions</span>
                     </h1>
-                    <p className="mt-4 max-w-2xl mx-auto text-xl text-gray-500">
+                    <p className="mt-4 max-w-2xl mx-auto text-xl text-gray-500 dark:text-gray-400">
                         Join the most prestigious events in the dog showing world.
                     </p>
                 </div>
@@ -72,11 +72,11 @@ const Competitions = () => {
                 {/* Active Competition Hero Card */}
                 {activeCompetition ? (
                     <div className="mb-16">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
                             <Award className="text-orange-600 h-6 w-6" />
                             Next Main Event
                         </h2>
-                        <div className="bg-white rounded-2xl shadow-xl overflow-hidden md:flex">
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden md:flex">
                             <div className="md:flex-shrink-0 md:w-1/2">
                                 <img
                                     className="h-48 w-full object-cover md:h-full"
@@ -88,10 +88,10 @@ const Competitions = () => {
                                 <div className="uppercase tracking-wide text-sm text-orange-600 font-semibold mb-2">
                                     Upcoming - Registration Open
                                 </div>
-                                <h3 className="block text-3xl leading-tight font-bold text-gray-900 mb-4">
+                                <h3 className="block text-3xl leading-tight font-bold text-gray-900 dark:text-white mb-4">
                                     {activeCompetition.title}
                                 </h3>
-                                <div className="space-y-4 text-gray-600 mb-8">
+                                <div className="space-y-4 text-gray-600 dark:text-gray-300 mb-8">
                                     <div className="flex items-center gap-3">
                                         <Calendar className="h-5 w-5 text-gray-400" />
                                         <span>{activeCompetition.acquisitionDate}</span>
@@ -103,6 +103,10 @@ const Competitions = () => {
                                     <div className="flex items-center gap-3">
                                         <MapPin className="h-5 w-5 text-gray-400" />
                                         <span>{activeCompetition.acquisitionPlace}</span>
+                                    </div>
+                                    <div className="flex items-center gap-3 text-red-600 font-medium">
+                                        <AlertCircle className="h-5 w-5" />
+                                        <span>Apply by: {activeCompetition.applicationDeadline}</span>
                                     </div>
                                 </div>
                                 <button
@@ -123,23 +127,31 @@ const Competitions = () => {
                 {/* All Competitions Grid */}
                 {otherCompetitions.length > 0 && (
                     <div>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6">Upcoming Schedule</h2>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Upcoming Schedule</h2>
                         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                             {otherCompetitions.map((comp) => (
-                                <div key={comp.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-100">
+                                <div key={comp.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-100 dark:border-gray-700">
                                     <div className="p-6">
-                                        <h3 className="text-xl font-bold text-gray-900 mb-3">{comp.title}</h3>
-                                        <div className="space-y-3 text-sm text-gray-500">
+                                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{comp.title}</h3>
+                                        <div className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
                                             <div className="flex items-center gap-2">
                                                 <Calendar className="h-4 w-4 text-orange-500" />
                                                 <span>{comp.acquisitionDate}</span>
                                             </div>
                                             <div className="flex items-center gap-2">
+                                                <Clock className="h-4 w-4 text-orange-500" />
+                                                <span>{comp.acquisitionTime}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
                                                 <MapPin className="h-4 w-4 text-orange-500" />
                                                 <span>{comp.acquisitionPlace}</span>
                                             </div>
+                                            <div className="flex items-center gap-2 text-red-500 font-medium">
+                                                <AlertCircle className="h-4 w-4" />
+                                                <span>Deadline: {comp.applicationDeadline}</span>
+                                            </div>
                                         </div>
-                                        <div className="mt-6 pt-4 border-t border-gray-100 flex justify-between items-center">
+                                        <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center">
                                             <span className="text-sm font-medium text-green-600">Registration Open</span>
                                             <button
                                                 onClick={() => handleRegister(comp.id)}

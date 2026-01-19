@@ -9,6 +9,7 @@ export interface User {
     city?: string;
     postalCode?: string;
     state?: string;
+    role: 'User' | 'Manager' | 'Admin';
 }
 
 export interface Dog {
@@ -40,6 +41,7 @@ export interface Competition {
     acquisitionDate: string;
     acquisitionTime: string;
     acquisitionPlace: string;
+    applicationDeadline: string;
     judges: Judge[];
 }
 
@@ -62,6 +64,7 @@ export interface RegisterRequest {
     email: string;
     username: string;
     password: string;
+    role?: string;
 }
 
 export interface PaymentRequest {

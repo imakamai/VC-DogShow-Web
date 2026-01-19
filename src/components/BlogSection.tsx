@@ -44,37 +44,37 @@ const BLOG_POSTS: BlogPost[] = [
 
 const BlogSection = () => {
     return (
-        <section className="py-16 bg-gray-50">
+        <section className="py-16 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+                    <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl">
                         News & Updates
                     </h2>
-                    <p className="mt-4 max-w-2xl mx-auto text-xl text-gray-500">
+                    <p className="mt-4 max-w-2xl mx-auto text-xl text-gray-500 dark:text-gray-400">
                         Stay informed with the latest tips, news, and insights from the dog show world.
                     </p>
                 </div>
 
                 <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                     {BLOG_POSTS.map((post) => (
-                        <div key={post.id} className="flex flex-col bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                        <div key={post.id} className="flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300">
                             <div className="flex-shrink-0">
                                 <img className="h-48 w-full object-cover" src={post.imageUrl} alt={post.title} />
                             </div>
                             <div className="flex-1 p-6 flex flex-col justify-between">
                                 <div className="flex-1">
-                                    <p className="text-sm font-medium text-orange-600">
+                                    <p className="text-sm font-medium text-orange-600 dark:text-orange-400">
                                         {post.category}
                                     </p>
-                                    <h3 className="mt-2 text-xl font-semibold text-gray-900">
+                                    <h3 className="mt-2 text-xl font-semibold text-gray-900 dark:text-white">
                                         {post.title}
                                     </h3>
-                                    <p className="mt-3 text-base text-gray-500">
+                                    <p className="mt-3 text-base text-gray-500 dark:text-gray-400">
                                         {post.excerpt}
                                     </p>
                                 </div>
                                 <div className="mt-6 flex items-center justify-between">
-                                    <div className="flex items-center text-sm text-gray-500">
+                                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                                         <div className="flex items-center mr-4">
                                             <Calendar className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
                                             <span>{post.date}</span>
@@ -86,7 +86,7 @@ const BlogSection = () => {
                                     </div>
                                 </div>
                                 <div className="mt-6">
-                                    <Link to="#" className="flex items-center text-base font-semibold text-orange-600 hover:text-orange-500 transition-colors">
+                                    <Link to="#" className="flex items-center text-base font-semibold text-orange-600 dark:text-orange-400 hover:text-orange-500 transition-colors">
                                         Read full article
                                         <ArrowRight className="ml-2 h-4 w-4" />
                                     </Link>
