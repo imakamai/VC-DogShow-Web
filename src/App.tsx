@@ -15,6 +15,9 @@ import Profile from './pages/Profile';
 import Pricing from './pages/Pricing';
 import Competitions from './pages/Competitions';
 import AddDog from './pages/AddDog';
+import CreateCompetition from './pages/CreateCompetition';
+import AdminDashboard from './pages/AdminDashboard';
+import ManagerDashboard from './pages/ManagerDashboard';
 
 function App() {
   return (
@@ -27,17 +30,17 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/dogs" element={
-                <ProtectedRoute>
+                <ProtectedRoute allowedRoles={['User']}>
                   <Dogs />
                 </ProtectedRoute>
               } />
               <Route path="/add-dog" element={
-                <ProtectedRoute>
+                <ProtectedRoute allowedRoles={['User']}>
                   <AddDog />
                 </ProtectedRoute>
               } />
               <Route path="/apply" element={
-                <ProtectedRoute>
+                <ProtectedRoute allowedRoles={['User']}>
                   <Apply />
                 </ProtectedRoute>
               } />
@@ -48,6 +51,21 @@ function App() {
               } />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/competitions" element={<Competitions />} />
+              <Route path="/create-competition" element={
+                <ProtectedRoute allowedRoles={['Manager', 'Admin']}>
+                  <CreateCompetition />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin" element={
+                <ProtectedRoute allowedRoles={['Admin']}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/manager" element={
+                <ProtectedRoute allowedRoles={['Manager', 'Admin']}>
+                  <ManagerDashboard />
+                </ProtectedRoute>
+              } />
             </Routes>
           </Layout>
         </Router>

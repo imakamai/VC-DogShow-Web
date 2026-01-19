@@ -7,7 +7,7 @@ import { useTheme } from '../context/ThemeContext';
 const Navbar = () => {
     const [isOpen, setIsOpen] = React.useState(false);
     const navigate = useNavigate();
-    const { isAuthenticated, logout } = useAuth();
+    const { isAuthenticated, user, logout } = useAuth();
     const { theme, toggleTheme } = useTheme();
 
     const handleLogout = () => {
@@ -28,10 +28,23 @@ const Navbar = () => {
                         <div className="hidden lg:block">
                             <div className="ml-10 flex items-baseline space-x-4">
                                 <Link to="/" className="text-gray-800 dark:text-gray-100 hover:text-orange-500 px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</Link>
-                                <Link to="/dogs" className="text-gray-800 dark:text-gray-100 hover:text-orange-500 px-3 py-2 rounded-md text-sm font-medium transition-colors">Dogs</Link>
-                                <Link to="/competitions" className="text-gray-800 dark:text-gray-100 hover:text-orange-500 px-3 py-2 rounded-md text-sm font-medium transition-colors">Competitions</Link>
-                                <Link to="/apply" className="text-gray-800 dark:text-gray-100 hover:text-orange-500 px-3 py-2 rounded-md text-sm font-medium transition-colors">Apply</Link>
-                                <Link to="/pricing" className="text-gray-800 dark:text-gray-100 hover:text-orange-500 px-3 py-2 rounded-md text-sm font-medium transition-colors">Pricing</Link>
+
+                                {(!user || user.role === 'User') && (
+                                    <>
+                                        <Link to="/dogs" className="text-gray-800 dark:text-gray-100 hover:text-orange-500 px-3 py-2 rounded-md text-sm font-medium transition-colors">Dogs</Link>
+                                        <Link to="/competitions" className="text-gray-800 dark:text-gray-100 hover:text-orange-500 px-3 py-2 rounded-md text-sm font-medium transition-colors">Competitions</Link>
+                                        <Link to="/apply" className="text-gray-800 dark:text-gray-100 hover:text-orange-500 px-3 py-2 rounded-md text-sm font-medium transition-colors">Apply</Link>
+                                        <Link to="/pricing" className="text-gray-800 dark:text-gray-100 hover:text-orange-500 px-3 py-2 rounded-md text-sm font-medium transition-colors">Pricing</Link>
+                                    </>
+                                )}
+
+                                {(user?.role === 'Manager' || user?.role === 'Admin') && (
+                                    <>
+                                        <Link to="/competitions" className="text-gray-800 dark:text-gray-100 hover:text-orange-500 px-3 py-2 rounded-md text-sm font-medium transition-colors">Competitions</Link>
+                                        <Link to={user.role === 'Admin' ? '/admin' : '/manager'} className="text-gray-800 dark:text-gray-100 hover:text-orange-500 px-3 py-2 rounded-md text-sm font-medium transition-colors">Dashboard</Link>
+                                        <Link to="/create-competition" className="text-gray-800 dark:text-gray-100 hover:text-orange-500 px-3 py-2 rounded-md text-sm font-medium transition-colors">Register Competition</Link>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -78,10 +91,24 @@ const Navbar = () => {
                 <div className="lg:hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-md">
                     <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                         <Link to="/" className="text-gray-800 dark:text-gray-100 hover:text-orange-500 block px-3 py-2 rounded-md text-base font-medium">Home</Link>
-                        <Link to="/dogs" className="text-gray-800 dark:text-gray-100 hover:text-orange-500 block px-3 py-2 rounded-md text-base font-medium">Dogs</Link>
-                        <Link to="/competitions" className="text-gray-800 dark:text-gray-100 hover:text-orange-500 block px-3 py-2 rounded-md text-base font-medium">Competitions</Link>
-                        <Link to="/apply" className="text-gray-800 dark:text-gray-100 hover:text-orange-500 block px-3 py-2 rounded-md text-base font-medium">Apply</Link>
-                        <Link to="/pricing" className="text-gray-800 dark:text-gray-100 hover:text-orange-500 block px-3 py-2 rounded-md text-base font-medium">Pricing</Link>
+
+                        {(!user || user.role === 'User') && (
+                            <>
+                                <Link to="/dogs" className="text-gray-800 dark:text-gray-100 hover:text-orange-500 block px-3 py-2 rounded-md text-base font-medium">Dogs</Link>
+                                <Link to="/competitions" className="text-gray-800 dark:text-gray-100 hover:text-orange-500 block px-3 py-2 rounded-md text-base font-medium">Competitions</Link>
+                                <Link to="/apply" className="text-gray-800 dark:text-gray-100 hover:text-orange-500 block px-3 py-2 rounded-md text-base font-medium">Apply</Link>
+                                <Link to="/pricing" className="text-gray-800 dark:text-gray-100 hover:text-orange-500 block px-3 py-2 rounded-md text-base font-medium">Pricing</Link>
+                            </>
+                        )}
+
+                        {(user?.role === 'Manager' || user?.role === 'Admin') && (
+                            <>
+                                <Link to="/competitions" className="text-gray-800 dark:text-gray-100 hover:text-orange-500 block px-3 py-2 rounded-md text-base font-medium">Competitions</Link>
+                                <Link to={user.role === 'Admin' ? '/admin' : '/manager'} className="text-gray-800 dark:text-gray-100 hover:text-orange-500 block px-3 py-2 rounded-md text-base font-medium">Dashboard</Link>
+                                <Link to="/create-competition" className="text-gray-800 dark:text-gray-100 hover:text-orange-500 block px-3 py-2 rounded-md text-base font-medium">Create Competition</Link>
+                            </>
+                        )}
+
                         {isAuthenticated ? (
                             <>
                                 <Link to="/profile" className="text-gray-800 dark:text-gray-100 hover:text-orange-500 block px-3 py-2 rounded-md text-base font-medium">Profile</Link>

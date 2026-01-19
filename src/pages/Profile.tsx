@@ -29,8 +29,18 @@ const Profile = () => {
         setLoading(true);
         try {
             // Ensure ID matches
-            const updatedUser = { ...data, id: user.id };
-            await api.put(`/User/${user.id}`, updatedUser);
+            const updatePayload = {
+                name: data.name,
+                lastName: data.lastName,
+                phone: data.phone,
+                address: data.address,
+                city: data.city,
+                postalCode: data.postalCode,
+                state: data.state,
+                email: data.email,
+                username: data.username
+            };
+            await api.put(`/User/${user.id}`, updatePayload);
             // Refresh page or context would be ideal, for now just reload window to get fresh context
             window.location.reload();
         } catch (error) {
@@ -87,6 +97,8 @@ const Profile = () => {
         );
     }
 
+
+
     return (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="bg-white dark:bg-gray-800 shadow-xl rounded-2xl overflow-hidden transition-colors duration-300">
@@ -98,9 +110,14 @@ const Profile = () => {
                         </div>
                         <div>
                             <h1 className="text-3xl font-bold">{user.name} {user.lastName}</h1>
-                            <p className="text-orange-100 flex items-center gap-2 mt-1">
-                                <Mail className="w-4 h-4" /> {user.email}
-                            </p>
+                            <div className="flex flex-col gap-1 mt-1">
+                                <p className="text-orange-100 flex items-center gap-2">
+                                    <Mail className="w-4 h-4" /> {user.email}
+                                </p>
+                                <span className="inline-block bg-white/20 text-xs px-2 py-1 rounded-full w-fit">
+                                    {user.role}
+                                </span>
+                            </div>
                         </div>
                         <div className="ml-auto">
                             {!isEditing && (
@@ -118,6 +135,13 @@ const Profile = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <Input label="First Name" {...register('name')} />
                                 <Input label="Last Name" {...register('lastName')} />
+
+                                {(user.role === 'Admin' || user.role === 'Manager') && (
+                                    <>
+                                        <Input label="Email" {...register('email')} />
+                                        <Input label="Username" {...register('username')} />
+                                    </>
+                                )}
                                 <Input label="Phone" {...register('phone')} />
                                 <Input label="Address" {...register('address')} />
                                 <Input label="City" {...register('city')} />
@@ -145,61 +169,67 @@ const Profile = () => {
                                         <p><span className="font-medium text-gray-900">Phone:</span> {user.phone || 'Not provided'}</p>
                                     </div>
                                 </div>
-                                <div className="bg-gray-50 dark:bg-gray-700/50 p-6 rounded-xl">
-                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                                        <MapPin className="w-5 h-5 text-orange-500" /> Address
-                                    </h3>
-                                    <div className="space-y-3 text-gray-600">
-                                        <p>{user.address || 'No address'}</p>
-                                        <p>{user.city ? `${user.city}, ` : ''}{user.state} {user.postalCode}</p>
+                                {!isEditing && (
+                                    <div className="bg-gray-50 dark:bg-gray-700/50 p-6 rounded-xl">
+                                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                                            <MapPin className="w-5 h-5 text-orange-500" /> Address
+                                        </h3>
+                                        <div className="space-y-3 text-gray-600">
+                                            <p>{user.address || 'No address'}</p>
+                                            <p>{user.city ? `${user.city}, ` : ''}{user.state} {user.postalCode}</p>
+                                        </div>
                                     </div>
-                                </div>
+                                )}
                             </div>
 
                             {/* Payment Methods Section */}
-                            <div className="bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-xl overflow-hidden">
-                                <div className="p-6 bg-gray-50 dark:bg-gray-700/50 border-b dark:border-gray-700 flex justify-between items-center">
-                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                                        <CreditCard className="w-5 h-5 text-orange-500" /> Payment Methods
-                                    </h3>
-                                    <Button size="sm" onClick={() => setShowAddCard(true)}>
-                                        <Plus className="w-4 h-4 mr-2" /> Add Card
+                            {user.role === 'User' && (
+                                <div className="bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-xl overflow-hidden">
+                                    <div className="p-6 bg-gray-50 dark:bg-gray-700/50 border-b dark:border-gray-700 flex justify-between items-center">
+                                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                                            <CreditCard className="w-5 h-5 text-orange-500" /> Payment Methods
+                                        </h3>
+                                        <Button size="sm" onClick={() => setShowAddCard(true)}>
+                                            <Plus className="w-4 h-4 mr-2" /> Add Card
+                                        </Button>
+                                    </div>
+                                    <div className="divide-y">
+                                        {paymentMethods.map((pm) => (
+                                            <div key={pm.id} className="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-12 h-8 bg-gray-100 dark:bg-gray-600 rounded border dark:border-gray-500 flex items-center justify-center text-xs font-bold text-gray-500 dark:text-gray-300 uppercase">
+                                                        {pm.brand}
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-medium text-gray-900 dark:text-white">•••• •••• •••• {pm.last4}</p>
+                                                        <p className="text-sm text-gray-500 dark:text-gray-400">Expires {pm.expiryMonth}/{pm.expiryYear}</p>
+                                                    </div>
+                                                </div>
+                                                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700" onClick={() => handleDeleteCard(pm.id)}>
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
+                                            </div>
+                                        ))}
+                                        {paymentMethods.length === 0 && (
+                                            <div className="p-8 text-center text-gray-500">
+                                                No payment methods added.
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {user.role === 'User' && (
+                                <div className="pt-6 border-t dark:border-gray-700 flex justify-between items-center bg-red-50 dark:bg-red-900/10 p-6 rounded-xl">
+                                    <div>
+                                        <h4 className="text-red-800 dark:text-red-300 font-semibold">Danger Zone</h4>
+                                        <p className="text-red-600 dark:text-red-400 text-sm">Delete your account and all associated data.</p>
+                                    </div>
+                                    <Button variant="outline" className="border-red-500 text-red-600 hover:bg-red-100" onClick={handleDelete}>
+                                        <Trash2 className="w-4 h-4 mr-2" /> Delete Account
                                     </Button>
                                 </div>
-                                <div className="divide-y">
-                                    {paymentMethods.map((pm) => (
-                                        <div key={pm.id} className="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-12 h-8 bg-gray-100 dark:bg-gray-600 rounded border dark:border-gray-500 flex items-center justify-center text-xs font-bold text-gray-500 dark:text-gray-300 uppercase">
-                                                    {pm.brand}
-                                                </div>
-                                                <div>
-                                                    <p className="font-medium text-gray-900 dark:text-white">•••• •••• •••• {pm.last4}</p>
-                                                    <p className="text-sm text-gray-500 dark:text-gray-400">Expires {pm.expiryMonth}/{pm.expiryYear}</p>
-                                                </div>
-                                            </div>
-                                            <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700" onClick={() => handleDeleteCard(pm.id)}>
-                                                <Trash2 className="w-4 h-4" />
-                                            </Button>
-                                        </div>
-                                    ))}
-                                    {paymentMethods.length === 0 && (
-                                        <div className="p-8 text-center text-gray-500">
-                                            No payment methods added.
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="pt-6 border-t dark:border-gray-700 flex justify-between items-center bg-red-50 dark:bg-red-900/10 p-6 rounded-xl">
-                                <div>
-                                    <h4 className="text-red-800 dark:text-red-300 font-semibold">Danger Zone</h4>
-                                    <p className="text-red-600 dark:text-red-400 text-sm">Delete your account and all associated data.</p>
-                                </div>
-                                <Button variant="outline" className="border-red-500 text-red-600 hover:bg-red-100" onClick={handleDelete}>
-                                    <Trash2 className="w-4 h-4 mr-2" /> Delete Account
-                                </Button>
-                            </div>
+                            )}
                         </div>
                     )}
                 </div>

@@ -4,6 +4,7 @@ import BlogSection from '../components/BlogSection';
 const Home = () => {
     return (
         <>
+
             <div className="relative overflow-hidden bg-white dark:bg-gray-900 transition-colors duration-300">
                 <div className="max-w-7xl mx-auto">
                     <div className="relative z-10 pb-8 bg-white dark:bg-gray-900 sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32 transition-colors duration-300">

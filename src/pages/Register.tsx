@@ -90,6 +90,8 @@ const Register = () => {
                         error={errors.password?.message}
                     />
 
+
+
                     {error && (
                         <div className="text-red-500 text-sm text-center bg-red-50 p-2 rounded-lg">
                             {error}

@@ -1,4 +1,6 @@
 import React from 'react';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { Check, FileText, Award, Users, Crown, Dog } from 'lucide-react';
 
 interface PricingItem {
@@ -14,6 +16,12 @@ interface PricingCategory {
 }
 
 const Pricing = () => {
+    const { user } = useAuth();
+
+    if (user && (user.role === 'Manager' || user.role === 'Admin')) {
+        return <Navigate to="/" replace />;
+    }
+
     const pricingData: PricingCategory[] = [
         {
             title: 'Pedigrees & Documents',
